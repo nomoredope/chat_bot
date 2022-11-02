@@ -31,14 +31,18 @@ def start(message):
 
 @bot.message_handler(commands=['pidor_reg'])
 def pidor_reg(message):
-    bot.send_message(message.chat.id, f'<b>{message.from_user.username},'
-                                      ' вы записаны в список пидорасов!</b>', parse_mode='html')
     temp_frame = pd.read_json('data/pidor_db.json')
     temp_row = {'id': len(temp_frame)+1, 'username': message.from_user.username, 'pidor_count': 0}
     temp_frame = temp_frame.append(temp_row, ignore_index=True)
-    filepath = Path('data/pidor_db.json')
-    temp_frame.to_json(filepath)
-    print(temp_frame)
+    if pd.Series(temp_frame["username"]).is_unique:
+        filepath = Path('data/pidor_db.json')
+        temp_frame.to_json(filepath)
+        print(temp_frame)
+        bot.send_message(message.chat.id, f'<b>{message.from_user.username},'
+                                          ' вы записаны в список пидорасов!</b>', parse_mode='html')
+    else:
+        bot.send_message(message.chat.id, f'<b>{message.from_user.username},'
+                                          ' вы уже давно стали гомосеком!</b>', parse_mode='html')
 
 
 @bot.message_handler(commands=['pidor'])
