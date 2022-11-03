@@ -32,6 +32,7 @@ def start(message):
     filepath = Path(f'data/pidor_{message.chat.id}_db.json')
     df.to_json(filepath)
 
+
 @bot.message_handler(commands=['pidor_reg'])
 def pidor_reg(message):
     temp_frame = pd.read_json(f'data/pidor_{message.chat.id}_db.json')
@@ -61,6 +62,17 @@ def pidor(message):
     temp_frame.at[rnd, 'pidor_count'] = temp_frame.pidor_count[rnd] + 1
     print(temp_frame)
     temp_frame.to_json(f'data/pidor_{message.chat.id}_db.json')
+
+
+@bot.message_handler(commands=['pidor_stats'])
+def pidor_stats(message):
+    temp_frame = pd.read_json(f'data/pidor_{message.chat.id}_db.json')
+    sort_frame = temp_frame.sort_values(by='pidor_count', ascending=False, kind="mergesort", ignore_index=True)
+    print(sort_frame)
+    bot.send_message(message.chat.id, '<b>Список пидорасов:</b>', parse_mode='html')
+    for i in range(len(sort_frame)):
+        bot.send_message(message.chat.id, f'№{i+1}: {sort_frame.username[i]} {sort_frame.pidor_count[i]} раз.\n\n'
+                         , parse_mode='html')
 
 
 bot.infinity_polling()
